@@ -71,9 +71,10 @@ function createLeague() {
     const button = document.createElement("button");
     button.textContent = "Actualitzar Classificació";
     button.id = `update-${groupName.replace(/\s+/g, "-").toLowerCase()}`;
-    button.addEventListener("click", () =>
-      updateStandings(groupDiv, groups[groupName], groupName)
-    );
+    button.addEventListener("click", () => {
+      updateStandings(groupDiv, groups[groupName], groupName);
+      generateKnockoutStage();
+    });
     groupDiv.appendChild(button);
 
     const table = document.createElement("table");
@@ -208,4 +209,178 @@ function displayStandings(groupDiv, standings) {
     .join("");
 }
 
-document.addEventListener("DOMContentLoaded", createLeague);
+function showTab(tabId) {
+  document.querySelectorAll(".tab-content").forEach((tab) => {
+    tab.style.display = "none";
+  });
+  document.getElementById(tabId).style.display = "block";
+}
+
+function generateKnockoutStage() {
+  let leftContainer = document.getElementById("knockout-left");
+  let rightContainer = document.getElementById("knockout-right");
+  let quarterfinalLeftContainer = document.getElementById("quarterfinal-left");
+  let quarterfinalRightContainer =
+    document.getElementById("quarterfinal-right");
+  let semifinalLeftContainer = document.getElementById("semifinal-left");
+  let semifinalRightContainer = document.getElementById("semifinal-right");
+  let finalContainer = document.getElementById("final-match");
+
+  leftContainer.innerHTML = "";
+  rightContainer.innerHTML = "";
+  quarterfinalLeftContainer.innerHTML = "";
+  quarterfinalRightContainer.innerHTML = "";
+  semifinalLeftContainer.innerHTML = "";
+  semifinalRightContainer.innerHTML = "";
+  finalContainer.innerHTML = "";
+
+  let knockoutTeams = [];
+
+  for (const groupName in groups) {
+    let standings = JSON.parse(localStorage.getItem(`standings_${groupName}`));
+
+    if (standings) {
+      let sortedTeams = Object.keys(standings).sort((a, b) => {
+        return (
+          standings[b].points - standings[a].points ||
+          standings[b].dg - standings[a].dg ||
+          standings[b].gf - standings[a].gf
+        );
+      });
+
+      if (sortedTeams.length >= 2) {
+        knockoutTeams.push({ team: sortedTeams[0], group: groupName });
+        knockoutTeams.push({ team: sortedTeams[1], group: groupName });
+      }
+    }
+  }
+
+  console.log(knockoutTeams);
+  let matches = [];
+
+  matches.push([knockoutTeams[0], knockoutTeams[3]]);
+  matches.push([knockoutTeams[4], knockoutTeams[7]]);
+  matches.push([knockoutTeams[8], knockoutTeams[11]]);
+  matches.push([knockoutTeams[12], knockoutTeams[15]]);
+  matches.push([knockoutTeams[2], knockoutTeams[1]]);
+  matches.push([knockoutTeams[6], knockoutTeams[5]]);
+  matches.push([knockoutTeams[10], knockoutTeams[9]]);
+  matches.push([knockoutTeams[14], knockoutTeams[13]]);
+
+  // for (let i = 0; i < knockoutTeams.length; i += 2) {
+  //   if (i + 1 < knockoutTeams.length) {
+  //     matches.push([knockoutTeams[i], knockoutTeams[i + 1]]);
+  //   }
+  // }
+
+  console.log(matches);
+
+  let rounds = {
+    vuitens: [],
+    quarts: [
+      { team1: "", team2: "" },
+      { team1: "", team2: "" },
+      { team1: "", team2: "" },
+      { team1: "", team2: "" },
+    ],
+    semifinals: [
+      { team1: "", team2: "" },
+      { team1: "", team2: "" },
+    ],
+    finals: [{ team1: "", team2: "" }],
+    tercer: [{ team1: "", team2: "" }],
+  };
+
+  matches.forEach((match, index) => {
+    let matchDiv = createMatch(
+      index + 1,
+      match[0].team,
+      match[1].team,
+      "quarterfinals",
+      Math.floor(index / 2)
+    );
+    if (index < 4) {
+      leftContainer.appendChild(matchDiv);
+    } else {
+      rightContainer.appendChild(matchDiv);
+    }
+    rounds.vuitens.push({ team1: match[0].team, team2: match[1].team });
+  });
+
+  // Afegir quarts de finals buits
+  for (let i = 0; i < 4; i++) {
+    let quarterDiv = createMatch(9 + i, "", "", "semifinals", 0);
+    if (i < 2) {
+      quarterfinalLeftContainer.appendChild(quarterDiv);
+    } else {
+      quarterfinalRightContainer.appendChild(quarterDiv);
+    }
+  }
+
+  // Afegir semifinals buides
+  for (let i = 0; i < 2; i++) {
+    let semiDiv = createMatch(13 + i, "", "", "finals", 0);
+    if (i === 0) {
+      semifinalLeftContainer.appendChild(semiDiv);
+    } else {
+      semifinalRightContainer.appendChild(semiDiv);
+    }
+  }
+
+  // Afegir final i tercer lloc
+  finalContainer.appendChild(createMatch(15, "", "", "", 0)); // Final
+  finalContainer.appendChild(createMatch(16, "", "", "", 0)); // 3r lloc
+}
+
+function createMatch(id, team1, team2, nextRound, nextIndex) {
+  let matchDiv = document.createElement("div");
+  matchDiv.classList.add("match");
+  matchDiv.innerHTML = `
+      <p><strong>Partit ${id}:</strong> <span id="team-${id}-1">${
+    team1 || "?"
+  }</span> vs <span id="team-${id}-2">${team2 || "?"}</span></p>
+      <input type="number" class="score" id="score-${id}-team1" min="0" placeholder="GF">
+      <input type="number" class="score" id="score-${id}-team2" min="0" placeholder="GF">
+      <button onclick="determineWinner(${id}, '${nextRound}', ${nextIndex})">Guardar</button>
+  `;
+  return matchDiv;
+}
+
+function determineWinner(matchId, nextRound, nextIndex) {
+  let score1 = parseInt(
+    document.getElementById(`score-${matchId}-team1`).value
+  );
+  let score2 = parseInt(
+    document.getElementById(`score-${matchId}-team2`).value
+  );
+
+  if (isNaN(score1) || isNaN(score2)) {
+    alert("Si us plau, introdueix un resultat vàlid.");
+    return;
+  }
+
+  let winner =
+    score1 > score2
+      ? document.getElementById(`team-${matchId}-1`).innerText
+      : document.getElementById(`team-${matchId}-2`).innerText;
+  let loser =
+    score1 < score2
+      ? document.getElementById(`team-${matchId}-1`).innerText
+      : document.getElementById(`team-${matchId}-2`).innerText;
+
+  if (nextRound === "semifinals") {
+    document.getElementById(`team-13-${nextIndex + 1}`).innerText = winner;
+  } else if (nextRound === "finals") {
+    document.getElementById("team-15-1").innerText = winner; // Final
+    document.getElementById("team-16-1").innerText = loser; // 3r lloc
+  } else if (matchId === 15) {
+    alert(`🏆 El campió és ${winner}!`);
+  } else if (matchId === 16) {
+    alert(`🥉 ${winner} guanya el tercer lloc!`);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  createLeague();
+  generateKnockoutStage();
+});

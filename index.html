@@ -8,7 +8,33 @@
 </head>
 <body>
     <h1>I Copa d'Odi Oriol Güell</h1>
-    <div id="league"></div>
+    <div class="tabs">
+        <button onclick="showTab('fase-grups')">Fase de Grups</button>
+        <button onclick="showTab('fase-final')">Fase Final</button>
+    </div>
+    
+    <div id="fase-grups" class="tab-content">
+        <div id="league"></div>
+    </div>
+    
+    <div id="fase-final" class="tab-content" style="display: none;">
+        <h2>Encreuaments de la Fase Final</h2>
+        <div class="bracket">
+            <div class="left-side">
+                <div id="knockout-left" class="round"></div>
+                <div id="quarterfinal-left" class="round"></div>
+                <div id="semifinal-left" class="round"></div>
+            </div>
+            <div class="final-round">
+                <div id="final-match" class="round"></div>
+            </div>
+            <div class="right-side">
+                <div id="knockout-right" class="round"></div>
+                <div id="quarterfinal-right" class="round"></div>
+                <div id="semifinal-right" class="round"></div>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
