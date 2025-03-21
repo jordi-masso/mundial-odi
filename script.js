@@ -111,6 +111,134 @@ function generateMatches(teams) {
   ];
 }
 
+let grupAResults = {
+  "Grup A-match-0": {
+    "Andreu Buenafuente": 9,
+    "Carme Arcarazo": 2,
+  },
+  "Grup A-match-1": {
+    "Marta Huguet": 10,
+    "Àlex Roca": 3,
+  },
+  "Grup A-match-4": {
+    "Andreu Buenafuente": 6,
+    "Àlex Roca": 7,
+  },
+  "Grup A-match-5": {
+    "Carme Arcarazo": 4,
+    "Marta Huguet": 9,
+  },
+};
+
+let grupBResults = {
+  "Grup B-match-0": {
+    "Pilar Rahola": 11,
+    "Pau Serrasolsas": 1,
+  },
+  "Grup B-match-1": {
+    "Basha Changue": 4,
+    "Juana Dolores": 7,
+  },
+  "Grup B-match-4": {
+    "Pilar Rahola": 11,
+    "Juana Dolores": 1,
+  },
+  "Grup B-match-5": {
+    "Pau Serrasolsas": 3,
+    "Basha Changue": 8,
+  },
+};
+
+let grupCResults = {
+  "Grup C-match-0": {
+    "Víctor Amela": 7,
+    "Sheila Peris": 4,
+  },
+  "Grup C-match-1": {
+    "Javier Cárdenas": 5,
+    "Josep Maria Bartomeu": 5,
+  },
+  "Grup C-match-4": {
+    "Víctor Amela": 6,
+    "Josep Maria Bartomeu": 4,
+  },
+  "Grup C-match-5": {
+    "Sheila Peris": 4,
+    "Javier Cárdenas": 7,
+  },
+};
+
+let grupDResults = {
+  "Grup D-match-0": {
+    "Ricard Ustrell": 2,
+    "El Dandy de Barcelona": 9,
+  },
+  "Grup D-match-1": {
+    "Joan Coscubiela": 5,
+    "Jordi Évole": 6,
+  },
+  "Grup D-match-4": {
+    "Ricard Ustrell": 4,
+    "Jordi Évole": 8,
+  },
+  "Grup D-match-5": {
+    "El Dandy de Barcelona": 6,
+    "Joan Coscubiela": 6,
+  },
+};
+
+let grupEResults = {
+  "Grup E-match-0": {
+    "Joan Tardà": 7,
+    "Sergi Cristóbal Jané": 6,
+  },
+  "Grup E-match-1": {
+    "Josep Borrell": 7,
+    "Xavier Sala i Martin": 6,
+  },
+  "Grup E-match-4": {
+    "Joan Tardà": 4,
+    "Xavier Sala i Martin": 8,
+  },
+  "Grup E-match-5": {
+    "Sergi Cristóbal Jané": 3,
+    "Josep Borrell": 8,
+  },
+};
+
+let grupFResults = {
+  "Grup F-match-0": {
+    "Josep Guardiola": 3,
+    "Carlos Carrizosa": 9,
+  },
+  "Grup F-match-1": {
+    "Josep Pedrerol": 10,
+    "Joan Canadell": 2,
+  },
+};
+
+let grupGResults = {
+  "Grup G-match-0": {
+    "Anthony Corey": 7,
+    "Inés Arrimadas": 5,
+  },
+  "Grup G-match-1": {
+    "Tian Baena": 8,
+    "Jéssica Albiach": 5,
+  },
+};
+
+let grupHResults = {
+  "Grup H-match-0": {
+    "Ada Colau": 6,
+    "Pol Molina": 6,
+  },
+  "Grup H-match-1": {
+    "Marc Lesan": 2,
+    "Arqueòleg Glamurós": 10,
+  },
+};
+
 function loadSavedResults(groupDiv, groupName) {
   let savedResults =
     JSON.parse(localStorage.getItem(`results_${groupName}`)) || {};
@@ -118,7 +246,43 @@ function loadSavedResults(groupDiv, groupName) {
     localStorage.getItem(`standings_${groupName}`)
   );
 
+  if (groupName === "Grup A") {
+    savedResults = { ...savedResults, ...grupAResults };
+  }
+
+  if (groupName === "Grup B") {
+    savedResults = { ...savedResults, ...grupBResults };
+  }
+
+  if (groupName === "Grup C") {
+    savedResults = { ...savedResults, ...grupCResults };
+  }
+
+  if (groupName === "Grup D") {
+    savedResults = { ...savedResults, ...grupDResults };
+  }
+
+  if (groupName === "Grup E") {
+    savedResults = { ...savedResults, ...grupEResults };
+  }
+
+  if (groupName === "Grup F") {
+    savedResults = { ...savedResults, ...grupFResults };
+  }
+
+  if (groupName === "Grup G") {
+    savedResults = { ...savedResults, ...grupGResults };
+  }
+
+  if (groupName === "Grup H") {
+    savedResults = { ...savedResults, ...grupHResults };
+  }
+
+  // Guardem els resultats fusionats a localStorage per assegurar persistència
+  localStorage.setItem(`results_${groupName}`, JSON.stringify(savedResults));
+
   const matches = groupDiv.querySelectorAll(".match");
+
   matches.forEach((match, index) => {
     const inputs = match.querySelectorAll(".score");
     let matchId = `${groupName}-match-${index}`;
@@ -133,6 +297,8 @@ function loadSavedResults(groupDiv, groupName) {
   if (savedStandings) {
     displayStandings(groupDiv, savedStandings);
   }
+
+  updateStandings(groupDiv, groups[groupName], groupName);
 }
 
 function updateStandings(groupDiv, teams, groupName) {
@@ -217,21 +383,15 @@ function showTab(tabId) {
 }
 
 function generateKnockoutStage() {
-  let leftContainer = document.getElementById("knockout-left");
-  let rightContainer = document.getElementById("knockout-right");
-  let quarterfinalLeftContainer = document.getElementById("quarterfinal-left");
-  let quarterfinalRightContainer =
-    document.getElementById("quarterfinal-right");
-  let semifinalLeftContainer = document.getElementById("semifinal-left");
-  let semifinalRightContainer = document.getElementById("semifinal-right");
+  let roundOf16Container = document.getElementById("round-of-16");
+  let quarterFinalsContainer = document.getElementById("quarter-finals");
+  let semiFinalsContainer = document.getElementById("semi-finals");
   let finalContainer = document.getElementById("final-match");
 
-  leftContainer.innerHTML = "";
-  rightContainer.innerHTML = "";
-  quarterfinalLeftContainer.innerHTML = "";
-  quarterfinalRightContainer.innerHTML = "";
-  semifinalLeftContainer.innerHTML = "";
-  semifinalRightContainer.innerHTML = "";
+  // Netejar contingut anterior
+  roundOf16Container.innerHTML = "";
+  quarterFinalsContainer.innerHTML = "";
+  semiFinalsContainer.innerHTML = "";
   finalContainer.innerHTML = "";
 
   let knockoutTeams = [];
@@ -255,26 +415,6 @@ function generateKnockoutStage() {
     }
   }
 
-  console.log(knockoutTeams);
-  let matches = [];
-
-  matches.push([knockoutTeams[0], knockoutTeams[3]]);
-  matches.push([knockoutTeams[4], knockoutTeams[7]]);
-  matches.push([knockoutTeams[8], knockoutTeams[11]]);
-  matches.push([knockoutTeams[12], knockoutTeams[15]]);
-  matches.push([knockoutTeams[2], knockoutTeams[1]]);
-  matches.push([knockoutTeams[6], knockoutTeams[5]]);
-  matches.push([knockoutTeams[10], knockoutTeams[9]]);
-  matches.push([knockoutTeams[14], knockoutTeams[13]]);
-
-  // for (let i = 0; i < knockoutTeams.length; i += 2) {
-  //   if (i + 1 < knockoutTeams.length) {
-  //     matches.push([knockoutTeams[i], knockoutTeams[i + 1]]);
-  //   }
-  // }
-
-  console.log(matches);
-
   let rounds = {
     vuitens: [],
     quarts: [
@@ -287,49 +427,58 @@ function generateKnockoutStage() {
       { team1: "", team2: "" },
       { team1: "", team2: "" },
     ],
-    finals: [{ team1: "", team2: "" }],
-    tercer: [{ team1: "", team2: "" }],
+    final: [{ team1: "", team2: "" }],
   };
 
-  matches.forEach((match, index) => {
+  rounds.vuitens.push([knockoutTeams[0], knockoutTeams[3]]);
+  rounds.vuitens.push([knockoutTeams[4], knockoutTeams[7]]);
+  rounds.vuitens.push([knockoutTeams[8], knockoutTeams[11]]);
+  rounds.vuitens.push([knockoutTeams[12], knockoutTeams[15]]);
+  rounds.vuitens.push([knockoutTeams[2], knockoutTeams[1]]);
+  rounds.vuitens.push([knockoutTeams[6], knockoutTeams[5]]);
+  rounds.vuitens.push([knockoutTeams[10], knockoutTeams[9]]);
+  rounds.vuitens.push([knockoutTeams[14], knockoutTeams[13]]);
+
+  for (let i = 0; i < rounds.vuitens.length; i += 1) {
     let matchDiv = createMatch(
-      index + 1,
-      match[0].team,
-      match[1].team,
-      "quarterfinals",
-      Math.floor(index / 2)
+      i + 1,
+      rounds.vuitens[i][0].team,
+      rounds.vuitens[i][1].team,
+      "quarts",
+      i
     );
-    if (index < 4) {
-      leftContainer.appendChild(matchDiv);
-    } else {
-      rightContainer.appendChild(matchDiv);
-    }
-    rounds.vuitens.push({ team1: match[0].team, team2: match[1].team });
-  });
+    roundOf16Container.appendChild(matchDiv);
+  }
 
-  // Afegir quarts de finals buits
+  // Crear espais buits per quarts de final
   for (let i = 0; i < 4; i++) {
-    let quarterDiv = createMatch(9 + i, "", "", "semifinals", 0);
-    if (i < 2) {
-      quarterfinalLeftContainer.appendChild(quarterDiv);
-    } else {
-      quarterfinalRightContainer.appendChild(quarterDiv);
-    }
+    let matchDiv = createMatch(9 + i, "", "", "semifinals", i);
+    quarterFinalsContainer.appendChild(matchDiv);
   }
 
-  // Afegir semifinals buides
+  // Crear espais buits per semifinals
   for (let i = 0; i < 2; i++) {
-    let semiDiv = createMatch(13 + i, "", "", "finals", 0);
-    if (i === 0) {
-      semifinalLeftContainer.appendChild(semiDiv);
-    } else {
-      semifinalRightContainer.appendChild(semiDiv);
-    }
+    let matchDiv = createMatch(13 + i, "", "", "final", i);
+    semiFinalsContainer.appendChild(matchDiv);
   }
 
-  // Afegir final i tercer lloc
-  finalContainer.appendChild(createMatch(15, "", "", "", 0)); // Final
-  finalContainer.appendChild(createMatch(16, "", "", "", 0)); // 3r lloc
+  // Crear títol per la final
+  const finalTitle = document.createElement("h3");
+  finalTitle.textContent = "Final Absoluta";
+  finalTitle.classList.add("match-title");
+  finalContainer.appendChild(finalTitle);
+
+  // Crear espai per la final
+  finalContainer.appendChild(createMatch(15, "", "", "", 0));
+
+  // Crear títol per la final de consolació
+  const consolationTitle = document.createElement("h3");
+  consolationTitle.textContent = "Final de Consolació";
+  consolationTitle.classList.add("match-title");
+  finalContainer.appendChild(consolationTitle);
+
+  // Crear espai per la final de consolació
+  finalContainer.appendChild(createMatch(16, "", "", "", 0));
 }
 
 function createMatch(id, team1, team2, nextRound, nextIndex) {
@@ -368,9 +517,17 @@ function determineWinner(matchId, nextRound, nextIndex) {
       ? document.getElementById(`team-${matchId}-1`).innerText
       : document.getElementById(`team-${matchId}-2`).innerText;
 
-  if (nextRound === "semifinals") {
-    document.getElementById(`team-13-${nextIndex + 1}`).innerText = winner;
-  } else if (nextRound === "finals") {
+  if (nextRound === "quarts") {
+    let index = nextIndex % 2 === 0 ? 1 : 2;
+    document.getElementById(
+      `team-${9 + Math.round((nextIndex - 1) / 2)}-${index}`
+    ).innerText = winner;
+  } else if (nextRound === "semifinals") {
+    let index = nextIndex % 2 === 0 ? 1 : 2;
+    document.getElementById(
+      `team-${13 + Math.round((nextIndex - 1) / 2)}-${index}`
+    ).innerText = winner;
+  } else if (nextRound === "final") {
     document.getElementById("team-15-1").innerText = winner; // Final
     document.getElementById("team-16-1").innerText = loser; // 3r lloc
   } else if (matchId === 15) {

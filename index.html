@@ -1,40 +1,52 @@
 <!DOCTYPE html>
 <html lang="ca">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>I Copa d'Odi Oriol Güell</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <h1>I Copa d'Odi Oriol Güell</h1>
     <div class="tabs">
-        <button onclick="showTab('fase-grups')">Fase de Grups</button>
-        <button onclick="showTab('fase-final')">Fase Final</button>
+      <button onclick="showTab('fase-grups')">Fase de Grups</button>
+      <button onclick="showTab('fase-final')">Fase Final</button>
     </div>
-    
+
     <div id="fase-grups" class="tab-content">
-        <div id="league"></div>
+      <div id="league"></div>
     </div>
-    
-    <div id="fase-final" class="tab-content" style="display: none;">
-        <h2>Encreuaments de la Fase Final</h2>
-        <div class="bracket">
-            <div class="left-side">
-                <div id="knockout-left" class="round"></div>
-                <div id="quarterfinal-left" class="round"></div>
-                <div id="semifinal-left" class="round"></div>
-            </div>
-            <div class="final-round">
-                <div id="final-match" class="round"></div>
-            </div>
-            <div class="right-side">
-                <div id="knockout-right" class="round"></div>
-                <div id="quarterfinal-right" class="round"></div>
-                <div id="semifinal-right" class="round"></div>
-            </div>
+
+    <div id="fase-final" class="tab-content" style="display: none">
+      <h2>Fase Final</h2>
+
+      <div class="eliminatoria-container">
+        <!-- VUITENS DE FINAL -->
+        <div class="round-container">
+          <h3>Vuitens de Final</h3>
+          <div id="round-of-16" class="matches-grid"></div>
         </div>
+
+        <!-- QUARTS DE FINAL -->
+        <div class="round-container">
+          <h3>Quarts de Final</h3>
+          <div id="quarter-finals" class="matches-grid"></div>
+        </div>
+
+        <!-- SEMIFINALS -->
+        <div class="round-container">
+          <h3>Semifinals</h3>
+          <div id="semi-finals" class="matches-grid"></div>
+        </div>
+
+        <!-- FINAL -->
+        <div class="round-container">
+          <h3>Final</h3>
+          <div id="final-match" class="matches-grid"></div>
+        </div>
+      </div>
     </div>
+
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
