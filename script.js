@@ -462,15 +462,6 @@ function generateKnockoutStage() {
     semiFinalsContainer.appendChild(matchDiv);
   }
 
-  // Crear títol per la final
-  const finalTitle = document.createElement("h3");
-  finalTitle.textContent = "Final Absoluta";
-  finalTitle.classList.add("match-title");
-  finalContainer.appendChild(finalTitle);
-
-  // Crear espai per la final
-  finalContainer.appendChild(createMatch(15, "", "", "", 0));
-
   // Crear títol per la final de consolació
   const consolationTitle = document.createElement("h3");
   consolationTitle.textContent = "Final de Consolació";
@@ -478,20 +469,33 @@ function generateKnockoutStage() {
   finalContainer.appendChild(consolationTitle);
 
   // Crear espai per la final de consolació
+  finalContainer.appendChild(createMatch(15, "", "", "", 0));
+
+  // Crear títol per la final
+  const finalTitle = document.createElement("h3");
+  finalTitle.textContent = "Final Absoluta";
+  finalTitle.classList.add("match-title");
+  finalContainer.appendChild(finalTitle);
+
+  // Crear espai per la final
   finalContainer.appendChild(createMatch(16, "", "", "", 0));
 }
 
 function createMatch(id, team1, team2, nextRound, nextIndex) {
   let matchDiv = document.createElement("div");
   matchDiv.classList.add("match");
+
   matchDiv.innerHTML = `
-      <p><strong>Partit ${id}:</strong> <span id="team-${id}-1">${
-    team1 || "?"
-  }</span> vs <span id="team-${id}-2">${team2 || "?"}</span></p>
-      <input type="number" class="score" id="score-${id}-team1" min="0" placeholder="GF">
-      <input type="number" class="score" id="score-${id}-team2" min="0" placeholder="GF">
-      <button onclick="determineWinner(${id}, '${nextRound}', ${nextIndex})">Guardar</button>
+    <div class="match-row">
+      <span class="team-name" id="team-${id}-1">${team1 || "?"}</span>
+      <input type="number" class="score" id="score-${id}-team1" min="0">
+      <span class="vs">vs</span>
+      <input type="number" class="score" id="score-${id}-team2" min="0">
+      <span class="team-name" id="team-${id}-2">${team2 || "?"}</span>
+      <button class="save-button" onclick="determineWinner(${id}, '${nextRound}', ${nextIndex})">Guardar</button>
+    </div>
   `;
+
   return matchDiv;
 }
 
@@ -528,11 +532,11 @@ function determineWinner(matchId, nextRound, nextIndex) {
       `team-${13 + Math.round((nextIndex - 1) / 2)}-${index}`
     ).innerText = winner;
   } else if (nextRound === "final") {
-    document.getElementById("team-15-1").innerText = winner; // Final
-    document.getElementById("team-16-1").innerText = loser; // 3r lloc
-  } else if (matchId === 15) {
-    alert(`🏆 El campió és ${winner}!`);
+    document.getElementById("team-15-1").innerText = loser; // 3r lloc
+    document.getElementById("team-16-1").innerText = winner; // Final
   } else if (matchId === 16) {
+    alert(`🏆 El campió és ${winner}!`);
+  } else if (matchId === 15) {
     alert(`🥉 ${winner} guanya el tercer lloc!`);
   }
 }

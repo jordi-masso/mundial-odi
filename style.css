@@ -184,7 +184,9 @@ tbody tr:hover {
   background: #fff;
   border: 2px solid #007bff;
   padding: 10px;
-  width: 200px;
+  min-width: 280px;
+  width: fit-content;
+  max-width: 100%;
   text-align: center;
   font-weight: bold;
   border-radius: 5px;
@@ -193,7 +195,9 @@ tbody tr:hover {
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  margin: 0 auto;
 }
+
 
 #fase-final .score {
   width: 50px;
@@ -251,6 +255,7 @@ tbody tr:hover {
 
 /* Cada partit */
 .match {
+  margin: 12px 0;
   background: white;
   border: 2px solid #007bff;
   padding: 15px;
@@ -267,10 +272,68 @@ tbody tr:hover {
   text-align: center;
 }
 
+.match-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap; /* 💥 Assegura que tot estigui a una sola línia */
+  gap: 10px;
+  background: #f4f4f4;
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  overflow-x: auto; /* Si cal, que no salti de línia sinó que faci scroll horitzontal */
+}
+
+.team-name {
+  font-weight: 600;
+  min-width: 100px;
+  text-align: center;
+}
+
+.score {
+  width: 50px;
+  padding: 6px;
+  text-align: center;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: white;
+}
+
+.vs {
+  font-weight: bold;
+  color: #999;
+}
+
+.save-button {
+  margin-left: auto;
+  padding: 6px 12px;
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-weight: 500;
+}
+
+.save-button:hover {
+  background-color: #005fa3;
+}
 
 /* Ajust per a pantalles petites */
 @media (max-width: 768px) {
   #league {
       grid-template-columns: 1fr; /* Es mostra en una sola columna en mòbils */
+  }
+  .match-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .save-button {
+    margin-left: 0;
+    width: 100%;
   }
 }
