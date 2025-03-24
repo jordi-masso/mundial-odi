@@ -216,8 +216,8 @@ let grupFResults = {
     "Joan Canadell": 2,
   },
   "Grup F-match-4": {
-    "Joan Canadell": 7,
     "Josep Guardiola": 4,
+    "Joan Canadell": 7,
   },
   "Grup F-match-5": {
     "Carlos Carrizosa": 8,
