@@ -72,8 +72,7 @@ function createLeague() {
     button.textContent = "Actualitzar Classificació";
     button.id = `update-${groupName.replace(/\s+/g, "-").toLowerCase()}`;
     button.addEventListener("click", () => {
-      updateStandings(groupDiv, groups[groupName], groupName);
-      generateKnockoutStage();
+      updateAllStandings();
     });
     groupDiv.appendChild(button);
 
@@ -234,6 +233,14 @@ let grupGResults = {
     "Tian Baena": 8,
     "Jéssica Albiach": 5,
   },
+  "Grup G-match-4": {
+    "Anthony Corey": 7,
+    "Jéssica Albiach": 3,
+  },
+  "Grup G-match-5": {
+    "Inés Arrimadas": 6,
+    "Tian Baena": 5,
+  },
 };
 
 let grupHResults = {
@@ -244,6 +251,14 @@ let grupHResults = {
   "Grup H-match-1": {
     "Marc Lesan": 2,
     "Arqueòleg Glamurós": 10,
+  },
+  "Grup H-match-4": {
+    "Ada Colau": 1,
+    "Arqueòleg Glamurós": 8,
+  },
+  "Grup H-match-5": {
+    "Pol Molina": 5,
+    "Marc Lesan": 5,
   },
 };
 
@@ -307,6 +322,21 @@ function loadSavedResults(groupDiv, groupName) {
   }
 
   updateStandings(groupDiv, groups[groupName], groupName);
+}
+
+function updateAllStandings() {
+  const groupDivs = document.querySelectorAll(".group");
+
+  let index = 0;
+  for (const groupName in groups) {
+    const groupDiv = groupDivs[index];
+    const teams = groups[groupName];
+
+    updateStandings(groupDiv, teams, groupName);
+    index++;
+  }
+
+  generateKnockoutStage();
 }
 
 function updateStandings(groupDiv, teams, groupName) {
@@ -500,53 +530,84 @@ function createMatch(id, team1, team2, nextRound, nextIndex) {
       <span class="vs">vs</span>
       <input type="number" class="score" id="score-${id}-team2" min="0">
       <span class="team-name" id="team-${id}-2">${team2 || "?"}</span>
-      <button class="save-button" onclick="determineWinner(${id}, '${nextRound}', ${nextIndex})">Guardar</button>
+      <button class="save-button" onclick="determineAllWinners()">Guardar</button>
     </div>
   `;
 
   return matchDiv;
 }
 
-function determineWinner(matchId, nextRound, nextIndex) {
-  let score1 = parseInt(
-    document.getElementById(`score-${matchId}-team1`).value
-  );
-  let score2 = parseInt(
-    document.getElementById(`score-${matchId}-team2`).value
-  );
+function determineAllWinners() {
+  const allMatches = document.querySelectorAll(".match-row");
 
-  if (isNaN(score1) || isNaN(score2)) {
-    alert("Si us plau, introdueix un resultat vàlid.");
-    return;
-  }
+  allMatches.forEach((matchRow) => {
+    const inputs = matchRow.querySelectorAll(".score");
+    if (inputs.length !== 2) return;
 
-  let winner =
-    score1 > score2
-      ? document.getElementById(`team-${matchId}-1`).innerText
-      : document.getElementById(`team-${matchId}-2`).innerText;
-  let loser =
-    score1 < score2
-      ? document.getElementById(`team-${matchId}-1`).innerText
-      : document.getElementById(`team-${matchId}-2`).innerText;
+    const input1 = inputs[0];
+    const input2 = inputs[1];
 
-  if (nextRound === "quarts") {
-    let index = nextIndex % 2 === 0 ? 1 : 2;
-    document.getElementById(
-      `team-${9 + Math.round((nextIndex - 1) / 2)}-${index}`
-    ).innerText = winner;
-  } else if (nextRound === "semifinals") {
-    let index = nextIndex % 2 === 0 ? 1 : 2;
-    document.getElementById(
-      `team-${13 + Math.round((nextIndex - 1) / 2)}-${index}`
-    ).innerText = winner;
-  } else if (nextRound === "final") {
-    document.getElementById("team-15-1").innerText = loser; // 3r lloc
-    document.getElementById("team-16-1").innerText = winner; // Final
-  } else if (matchId === 16) {
-    alert(`🏆 El campió és ${winner}!`);
-  } else if (matchId === 15) {
-    alert(`🥉 ${winner} guanya el tercer lloc!`);
-  }
+    const score1 = parseInt(input1.value);
+    const score2 = parseInt(input2.value);
+
+    if (isNaN(score1) || isNaN(score2)) return;
+
+    // Extraure l'id del partit a partir dels ID dels inputs
+    const idRegex = /score-(\d+)-team/;
+    const match = input1.id.match(idRegex);
+    if (!match) return;
+
+    const matchId = parseInt(match[1]);
+
+    const team1Name = matchRow.querySelector(`#team-${matchId}-1`)?.innerText;
+    const team2Name = matchRow.querySelector(`#team-${matchId}-2`)?.innerText;
+
+    const winner = score1 > score2 ? team1Name : team2Name;
+    const loser = score1 < score2 ? team1Name : team2Name;
+
+    // Decideix a quina ronda anem (aquí pots afinar més si vols)
+    let nextRound = "";
+    let nextIndex = -1;
+
+    if (matchId >= 1 && matchId <= 8) {
+      nextRound = "quarts";
+      nextIndex = matchId - 1;
+    } else if (matchId >= 9 && matchId <= 12) {
+      nextRound = "semifinals";
+      nextIndex = matchId - 9;
+    } else if (matchId >= 13 && matchId <= 14) {
+      nextRound = "final";
+      nextIndex = matchId - 13;
+    } else if (matchId === 15 || matchId === 16) {
+      // finals
+      if (matchId === 16) {
+        alert(`🏆 El campió és ${winner}!`);
+      } else if (matchId === 15) {
+        alert(`🥉 ${winner} guanya el tercer lloc!`);
+      }
+      return;
+    }
+
+    if (nextRound === "quarts") {
+      let index = nextIndex % 2 === 0 ? 1 : 2;
+      document.getElementById(
+        `team-${9 + Math.round((nextIndex - 1) / 2)}-${index}`
+      ).innerText = winner;
+    } else if (nextRound === "semifinals") {
+      let index = nextIndex % 2 === 0 ? 1 : 2;
+      document.getElementById(
+        `team-${13 + Math.round((nextIndex - 1) / 2)}-${index}`
+      ).innerText = winner;
+    } else if (nextRound === "final") {
+      let index = nextIndex % 2 === 0 ? 1 : 2;
+      document.getElementById(`team-15-${index}`).innerText = loser; // 3r lloc
+      document.getElementById(`team-16-${index}`).innerText = winner; // Final
+    } else if (matchId === 16) {
+      alert(`🏆 El campió és ${winner}!`);
+    } else if (matchId === 15) {
+      alert(`🥉 ${winner} guanya el tercer lloc!`);
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
